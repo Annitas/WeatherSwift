@@ -10,7 +10,7 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         ZStack {
-            LinearGradient(colors: [.blue, .white],
+            LinearGradient(colors: [Color("topGradient"), Color("bottomGradient")],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing)
                     .edgesIgnoringSafeArea(.all)
@@ -20,20 +20,38 @@ struct ContentView: View {
                     .foregroundColor(.white)
                     .padding(5)
                 VStack(spacing: 8) {
-                    Image(systemName: "cloud.sun.rain.fill")//поправить фон
+                    Image(systemName: "cloud.sun.rain.fill")
                         .renderingMode(.original)//make icon colorful
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 120, height: 100)
                     
-                    Text("27")
+                    Text("27°")
                         .font(.system(size: 40, weight: .light, design: .default))
                         .foregroundColor(.white)//degrees
                 }
-                HStack {
-                    ExtractedView()
+                Spacer()
+                HStack(spacing: 5) {
+                    WeatherDayView(weekDay: "MON",
+                                   imageDay: "cloud.sun.rain.fill",
+                                   temperature: 20)
+                    WeatherDayView(weekDay: "TUE",
+                                   imageDay: "cloud.bolt.rain.fill",
+                                   temperature: 20)
+                    WeatherDayView(weekDay: "WED",
+                                   imageDay: "cloud.rain.fill",
+                                   temperature: 20)
+                    WeatherDayView(weekDay: "THU",
+                                   imageDay: "cloud.sun.bolt.fill",
+                                   temperature: 20)
+                    WeatherDayView(weekDay: "FRI",
+                                   imageDay: "cloud.sleet.fill",
+                                   temperature: 20)
+                    WeatherDayView(weekDay: "SAT",
+                                   imageDay: "cloud.fill",
+                                   temperature: 20)
                 }
-                Spacer() //move text upp
+                Spacer() 
             }
         }
         
@@ -49,18 +67,22 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-struct ExtractedView: View {
+struct WeatherDayView: View {
+    var weekDay: String
+    var imageDay: String
+    var temperature: Int
+    
     var body: some View {
         VStack {
-            Text("MON")
+            Text(weekDay)
                 .font(.system(size: 16, weight: .medium, design: .default))
                 .foregroundColor(.white)
-            Image(systemName: "cloud.sun.rain.fill")//поправить фон
+            Image(systemName: imageDay)//поправить фон
                 .renderingMode(.original)//make icon colorful
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 40, height: 40)
-            Text("27")
+            Text("\(temperature)°")
                 .font(.system(size: 28, weight: .light, design: .default))
                 .foregroundColor(.white)//degrees
         }
