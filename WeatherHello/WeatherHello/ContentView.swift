@@ -8,29 +8,20 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @State private var isNight = false
+    
     var body: some View {
         ZStack {
-            LinearGradient(colors: [Color("topGradient"), Color("bottomGradient")],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing)
-                    .edgesIgnoringSafeArea(.all)
+            
+            
+            BackgroundView(topColor: isNight ? .black : Color("topGradient"),
+                           bottomColor: isNight ? .gray : Color("bottomGradient"))
             VStack {
-                Text("Omsk")
-                    .font(.system(size: 30, weight: .medium, design: .default))
-                    .foregroundColor(.white)
-                    .padding(5)
-                VStack(spacing: 8) {
-                    Image(systemName: "cloud.sun.rain.fill")
-                        .renderingMode(.original)//make icon colorful
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 120, height: 100)
-                    
-                    Text("27°")
-                        .font(.system(size: 40, weight: .light, design: .default))
-                        .foregroundColor(.white)//degrees
-                }
-                Spacer()
+                CityView(cityName: "Omsk")
+                
+                WeatherIconView(weatherIcon: "cloud.sun.rain.fill", degrees: 23)
+                
                 HStack(spacing: 5) {
                     WeatherDayView(weekDay: "MON",
                                    imageDay: "cloud.sun.rain.fill",
@@ -51,7 +42,14 @@ struct ContentView: View {
                                    imageDay: "cloud.fill",
                                    temperature: 20)
                 }
-                Spacer() 
+                Spacer()
+                
+                Button {//btn do
+                    isNight.toggle()
+                } label: {
+                    ChangeDayView(imageName: "sun.min")
+                }
+                Spacer()
             }
         }
         
@@ -62,7 +60,7 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             ContentView()
-            ContentView()
+            //ContentView()
         }
     }
 }
@@ -88,3 +86,47 @@ struct WeatherDayView: View {
         }
     }
 }
+
+struct BackgroundView: View {
+    var topColor: Color
+    var bottomColor: Color
+    
+    var body: some View {
+        LinearGradient(colors: [topColor, bottomColor],
+                       startPoint: .topLeading,
+                       endPoint: .bottomTrailing)
+            .edgesIgnoringSafeArea(.all)
+    }
+}
+
+struct CityView: View {
+    var cityName: String
+     
+    var body: some View {
+        Text(cityName)
+            .font(.system(size: 30, weight: .medium, design: .default))
+            .foregroundColor(.white)
+            .padding(5)
+    }
+}
+
+struct WeatherIconView: View {
+    var weatherIcon: String
+    var degrees: Int
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: weatherIcon)
+                .renderingMode(.original)//make icon colorful
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 120, height: 100)
+            
+            Text("\(degrees)°")
+                .font(.system(size: 40, weight: .light, design: .default))
+                .foregroundColor(.white)//degrees
+        }
+        .padding(.bottom, 40)
+    }
+}
+
