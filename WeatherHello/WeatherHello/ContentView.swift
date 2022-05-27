@@ -8,7 +8,7 @@
 import SwiftUI
 //import CoreLocation
 
-class SearchBar: NSObject, ObservableObject {
+/*class SearchBar: NSObject, ObservableObject {
     
     @Published var text: String = ""
     let searchController: UISearchController = UISearchController(searchResultsController: nil)
@@ -50,7 +50,7 @@ extension View {
     func add(_ searchBar: SearchBar) -> some View {
         return self.modifier(SearchBarModifier(searchBar: searchBar))
     }
-}
+}*/
 
 struct ContentView: View {
     
@@ -58,16 +58,22 @@ struct ContentView: View {
     @State public var searchText = ""
 
     var body: some View {
-        NavigationView {
+        //NavigationView {
         ZStack {
             BackgroundView(topColor: isNight ? .black : Color("topGradient"),
                            bottomColor: isNight ? .gray : Color("bottomGradient"))
-            VStack {
+            VStack() {
+                HStack{
                 TextField("Search", text: $searchText)
-                                    .padding(7)
-                                    .background(Color(.systemGray6))
-                                    .cornerRadius(8)
-                                    
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                Button {
+                    getWeatherForecast(for: searchText)
+                } label: {
+                    Image(systemName: "magnifyingglass.circle.fill")
+                        .font(.title3)
+                  }
+                }
+                //Spacer()
                 CityView(cityName: searchText)
                 //--------------------------------------------------
                 //let key = "d2b758466054981c7a9596f7549c12be";
@@ -109,56 +115,45 @@ struct ContentView: View {
                 Spacer()
             }
         }
-        }
+        //.padding(.horizontal)
+        //.navigationTitle("Weather")
+        //}
+        
     }
-}
-
-struct Forecast: Codable {
-    struct FList: Codable {
-        let dt: Date
-        struct Temp: Codable {
-            let day: Double//day temperature
-        }
-        let temperature: Temp
-        let humidity: Int //humidity
-        struct Weather: Codable {
-            let icon: String //?
-            var weatherIconURL: URL {
-                let urlString = "http://openweathermap.org/img/wn/\(icon)@2x.png"
-                return URL(string: urlString)!
-            }
-        }
-        let weather: [Weather]
-        let clouds: Int //clouds
-    }
-    let flist: [FList]
-}
-
-func kek(city: String) -> Void { 
-let apiService = APIService.shared
-let dateFormatter = DateFormatter()
-dateFormatter.dateFormat = "E, MMM, d"
     
-
-apiService.getJSON(urlString: "http://api.openweathermap.org/data/2.5/forecast?q=\(city)&appid=d2b758466054981c7a9596f7549c12be",
-                   dateDecodingStrategy: .secondsSince1970) { (result: Result<Forecast, APIService.APIError>) in
-    switch result {
-    case .success(let forecast):
-        for day in forecast.flist {//daily
-            print(dateFormatter.string(from:day.dt))
-            print("   Humidity: ", day.humidity)
-            print("   Clouds: ", day.clouds)
-            print("   IconURL: ", day.weather[0].weatherIconURL)//equal string
-            print("   Temperature: ", day.temperature)
-        }
-    case .failure(let apiError):
-        switch apiError {
-        case .error(let errorString):
-            print(errorString )
-        }
+    func getWeatherForecast(for location: String) {
+        let apiService = APIService.shared
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "E, MMM, d"
+            
+//&units=metric
+        apiService.getJSON(urlString: "http://api.openweathermap.org/data/2.5/forecast?q=\(location)&appid=d2b758466054981c7a9596f7549c12be",
+                           dateDecodingStrategy: .secondsSince1970) { (result: Result<Forecast, APIService.APIError>) in
+            switch result {
+            case .success(let forecast):
+                for day in forecast.flist {//daily
+                    print(dateFormatter.string(from:day.dt))
+                    print("   Humidity: ", day.humidity)
+                    print("   Clouds: ", day.clouds)
+                    print("   IconURL: ", day.weather[0].weatherIconURL)//equal string
+                    print("   Temperature: ", day.temp)
+                }
+            case .failure(let apiError):
+                switch apiError {
+                case .error(let errorString):
+                    print(errorString )
+                }
+            }
+          }
     }
-  }
+    
 }
+
+
+
+//func kek(city: String) -> Void {
+
+//}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
