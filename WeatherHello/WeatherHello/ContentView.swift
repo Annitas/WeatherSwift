@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+//import CoreLocation
 
 class SearchBar: NSObject, ObservableObject {
     
@@ -54,7 +55,7 @@ extension View {
 struct ContentView: View {
     
     @State private var isNight = false
-    @State var searchText = ""
+    @State public var searchText = ""
 
     var body: some View {
         NavigationView {
@@ -68,12 +69,14 @@ struct ContentView: View {
                                     .cornerRadius(8)
                                     
                 CityView(cityName: searchText)
-                
                 //--------------------------------------------------
-                let key = "d2b758466054981c7a9596f7549c12be";
-                var ur = "api.openweathermap.org/data/2.5/forecast?q=\(searchText)&appid=\(key)"
+                //let key = "d2b758466054981c7a9596f7549c12be";
+                //var url = "api.openweathermap.org/data/2.5/forecast?q=\(searchText)&appid=\(key)&units=metric"
+                //let urlString = NSURL(string: url)
+                //let weatherObject = NSData(contentsOf: urlString! as URL)
                 
-                var url = "https://api.openweathermap.org/data/2.5/weather?q=" + searchText + "&appid=" + key + "&units=metric";
+                
+
                 WeatherIconView(weatherIcon: "cloud.sun.rain.fill", degrees: 23)
                 //-------------------------------------------------------
                 HStack(spacing: 5) {
@@ -110,7 +113,52 @@ struct ContentView: View {
     }
 }
 
+struct Forecast: Codable {
+    struct FList: Codable {
+        let dt: Date
+        struct Temp: Codable {
+            let day: Double//day temperature
+        }
+        let temperature: Temp
+        let humidity: Int //humidity
+        struct Weather: Codable {
+            let icon: String //?
+            var weatherIconURL: URL {
+                let urlString = "http://openweathermap.org/img/wn/\(icon)@2x.png"
+                return URL(string: urlString)!
+            }
+        }
+        let weather: [Weather]
+        let clouds: Int //clouds
+    }
+    let flist: [FList]
+}
 
+func kek(city: String) -> Void { 
+let apiService = APIService.shared
+let dateFormatter = DateFormatter()
+dateFormatter.dateFormat = "E, MMM, d"
+    
+
+apiService.getJSON(urlString: "http://api.openweathermap.org/data/2.5/forecast?q=\(city)&appid=d2b758466054981c7a9596f7549c12be",
+                   dateDecodingStrategy: .secondsSince1970) { (result: Result<Forecast, APIService.APIError>) in
+    switch result {
+    case .success(let forecast):
+        for day in forecast.flist {//daily
+            print(dateFormatter.string(from:day.dt))
+            print("   Humidity: ", day.humidity)
+            print("   Clouds: ", day.clouds)
+            print("   IconURL: ", day.weather[0].weatherIconURL)//equal string
+            print("   Temperature: ", day.temperature)
+        }
+    case .failure(let apiError):
+        switch apiError {
+        case .error(let errorString):
+            print(errorString )
+        }
+    }
+  }
+}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
