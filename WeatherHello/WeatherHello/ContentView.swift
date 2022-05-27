@@ -7,21 +7,75 @@
 
 import SwiftUI
 
+class SearchBar: NSObject, ObservableObject {
+    
+    @Published var text: String = ""
+    let searchController: UISearchController = UISearchController(searchResultsController: nil)
+    
+    override init() {
+        super.init()
+        self.searchController.obscuresBackgroundDuringPresentation = false
+        self.searchController.searchResultsUpdater = self
+    }
+}
+
+extension SearchBar: UISearchResultsUpdating {
+   
+    func updateSearchResults(for searchController: UISearchController) {
+        
+        // Publish search bar text changes.
+        if let searchBarText = searchController.searchBar.text {
+            self.text = searchBarText
+        }
+    }
+}
+struct SearchBarModifier: ViewModifier {
+    
+    let searchBar: SearchBar
+    
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                ViewControllerResolver { viewController in
+                    viewController.navigationItem.searchController = self.searchBar.searchController
+                }
+                    .frame(width: 0, height: 0)
+            )
+    }
+}
+
+extension View {
+    
+    func add(_ searchBar: SearchBar) -> some View {
+        return self.modifier(SearchBarModifier(searchBar: searchBar))
+    }
+}
+
 struct ContentView: View {
     
     @State private var isNight = false
-    
+    @State var searchText = ""
+
     var body: some View {
+        NavigationView {
         ZStack {
-            
-            
             BackgroundView(topColor: isNight ? .black : Color("topGradient"),
                            bottomColor: isNight ? .gray : Color("bottomGradient"))
             VStack {
-                CityView(cityName: "Omsk")
+                TextField("Search", text: $searchText)
+                                    .padding(7)
+                                    .background(Color(.systemGray6))
+                                    .cornerRadius(8)
+                                    
+                CityView(cityName: searchText)
                 
+                //--------------------------------------------------
+                let key = "d2b758466054981c7a9596f7549c12be";
+                var ur = "api.openweathermap.org/data/2.5/forecast?q=\(searchText)&appid=\(key)"
+                
+                var url = "https://api.openweathermap.org/data/2.5/weather?q=" + searchText + "&appid=" + key + "&units=metric";
                 WeatherIconView(weatherIcon: "cloud.sun.rain.fill", degrees: 23)
-                
+                //-------------------------------------------------------
                 HStack(spacing: 5) {
                     WeatherDayView(weekDay: "MON",
                                    imageDay: "cloud.sun.rain.fill",
@@ -52,15 +106,16 @@ struct ContentView: View {
                 Spacer()
             }
         }
-        
+        }
     }
 }
+
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             ContentView()
-            //ContentView()
         }
     }
 }
