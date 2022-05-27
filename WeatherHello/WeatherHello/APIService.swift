@@ -9,40 +9,42 @@ import Foundation
 
 public class APIService {
     public static let shared = APIService()
-    public enum APIError : Error {
-        case error(_errorString: String)
+    
+    public enum APIError: Error {
+        case error(_ errorString: String)
     }
     
-    public  func getJSON <T: Decodable>(urlString: String,
-                                        dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate,
-                                        keyDecodinfStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys,
-                                        completion: @escaping (Result<T, APIError >) -> Void) {
-        guard let url = URL(string: urlString ) else {
-            completion(.failure(.error(_errorString: NSLocalizedString("Error: Invalid url", comment: ""))))
+    public func getJSON<T: Decodable>(urlString: String,
+                                      dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate,
+                                      keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys,
+                                      completion: @escaping (Result<T,APIError>) -> Void) {
+        guard let url = URL(string: urlString) else {
+            completion(.failure(.error(NSLocalizedString("Error: Invalid URL", comment: ""))))
             return
         }
         let request = URLRequest(url: url)
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let error = error {
-                completion(.failure(.error(_errorString: "Error: \(error.localizedDescription)")))
+                completion(.failure(.error("Error: \(error.localizedDescription)")))
                 return
             }
             
             guard let data = data else {
-                completion(.failure(.error(_errorString: NSLocalizedString("Error: Invalid url", comment: ""))))
+                completion(.failure(.error(NSLocalizedString("Error: Data us corrupt.", comment: ""))))
                 return
             }
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = dateDecodingStrategy
-            decoder.keyDecodingStrategy = keyDecodinfStrategy
+            decoder.keyDecodingStrategy = keyDecodingStrategy
             do {
-                let decodedData =  try decoder.decode(Forecast.self, from: data)
-                completion(.success(decodedData as! T))
+                let decodedData = try decoder.decode(T.self, from: data)
+                completion(.success(decodedData))
                 return
             } catch let decodingError {
-                completion(.failure(APIError.error(_errorString: "Error: \(decodingError.localizedDescription)")))
+                completion(.failure(APIError.error("Error: \(decodingError.localizedDescription)")))
                 return
             }
+            
         }.resume()
     }
 }

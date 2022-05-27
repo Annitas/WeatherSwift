@@ -11,7 +11,7 @@ struct Forecast: Codable {
     struct Daily: Codable {
         let dt: Date
         struct Temp: Codable {
-            let day: Double//day temperature
+            let feels_like: Double//day temperature
         }
         let temp: Temp
         let humidity: Int //humidity
@@ -25,5 +25,5 @@ struct Forecast: Codable {
         let weather: [Weather]
         let clouds: Int //clouds
     }
-    let flist: [Daily]
+    let daily: [Daily]
 }

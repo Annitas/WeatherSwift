@@ -6,52 +6,6 @@
 //
 
 import SwiftUI
-//import CoreLocation
-
-/*class SearchBar: NSObject, ObservableObject {
-    
-    @Published var text: String = ""
-    let searchController: UISearchController = UISearchController(searchResultsController: nil)
-    
-    override init() {
-        super.init()
-        self.searchController.obscuresBackgroundDuringPresentation = false
-        self.searchController.searchResultsUpdater = self
-    }
-}
-
-extension SearchBar: UISearchResultsUpdating {
-   
-    func updateSearchResults(for searchController: UISearchController) {
-        
-        // Publish search bar text changes.
-        if let searchBarText = searchController.searchBar.text {
-            self.text = searchBarText
-        }
-    }
-}
-struct SearchBarModifier: ViewModifier {
-    
-    let searchBar: SearchBar
-    
-    func body(content: Content) -> some View {
-        content
-            .overlay(
-                ViewControllerResolver { viewController in
-                    viewController.navigationItem.searchController = self.searchBar.searchController
-                }
-                    .frame(width: 0, height: 0)
-            )
-    }
-}
-
-extension View {
-    
-    func add(_ searchBar: SearchBar) -> some View {
-        return self.modifier(SearchBarModifier(searchBar: searchBar))
-    }
-}*/
-
 struct ContentView: View {
     
     @State private var isNight = false
@@ -73,9 +27,7 @@ struct ContentView: View {
                         .font(.title3)
                   }
                 }
-                //Spacer()
                 CityView(cityName: searchText)
-                //--------------------------------------------------
                 //let key = "d2b758466054981c7a9596f7549c12be";
                 //var url = "api.openweathermap.org/data/2.5/forecast?q=\(searchText)&appid=\(key)&units=metric"
                 //let urlString = NSURL(string: url)
@@ -84,7 +36,7 @@ struct ContentView: View {
                 
 
                 WeatherIconView(weatherIcon: "cloud.sun.rain.fill", degrees: 23)
-                //-------------------------------------------------------
+
                 HStack(spacing: 5) {
                     WeatherDayView(weekDay: "MON",
                                    imageDay: "cloud.sun.rain.fill",
@@ -115,10 +67,7 @@ struct ContentView: View {
                 Spacer()
             }
         }
-        //.padding(.horizontal)
-        //.navigationTitle("Weather")
-        //}
-        
+
     }
     
     func getWeatherForecast(for location: String) {
@@ -127,11 +76,11 @@ struct ContentView: View {
         dateFormatter.dateFormat = "E, MMM, d"
             
 //&units=metric
-        apiService.getJSON(urlString: "http://api.openweathermap.org/data/2.5/forecast?q=\(location)&appid=d2b758466054981c7a9596f7549c12be",
+        apiService.getJSON(urlString: "https://api.openweathermap.org/data/2.5/weather?q=\(location)&appid=d2b758466054981c7a9596f7549c12be&units=metric",
                            dateDecodingStrategy: .secondsSince1970) { (result: Result<Forecast, APIService.APIError>) in
             switch result {
             case .success(let forecast):
-                for day in forecast.flist {//daily
+                for day in forecast.daily {//daily
                     print(dateFormatter.string(from:day.dt))
                     print("   Humidity: ", day.humidity)
                     print("   Clouds: ", day.clouds)
@@ -148,12 +97,6 @@ struct ContentView: View {
     }
     
 }
-
-
-
-//func kek(city: String) -> Void {
-
-//}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
@@ -173,14 +116,14 @@ struct WeatherDayView: View {
             Text(weekDay)
                 .font(.system(size: 16, weight: .medium, design: .default))
                 .foregroundColor(.white)
-            Image(systemName: imageDay)//поправить фон
-                .renderingMode(.original)//make icon colorful
+            Image(systemName: imageDay)
+                .renderingMode(.original)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 40, height: 40)
             Text("\(temperature)°")
                 .font(.system(size: 28, weight: .light, design: .default))
-                .foregroundColor(.white)//degrees
+                .foregroundColor(.white)
         }
     }
 }
@@ -215,14 +158,14 @@ struct WeatherIconView: View {
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: weatherIcon)
-                .renderingMode(.original)//make icon colorful
+                .renderingMode(.original)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 120, height: 100)
             
             Text("\(degrees)°")
                 .font(.system(size: 40, weight: .light, design: .default))
-                .foregroundColor(.white)//degrees
+                .foregroundColor(.white)
         }
         .padding(.bottom, 40)
     }
