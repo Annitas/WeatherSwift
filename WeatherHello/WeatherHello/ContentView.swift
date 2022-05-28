@@ -30,10 +30,6 @@ struct ContentView: View {
                 CityView(cityName: searchText)
                 //let key = "d2b758466054981c7a9596f7549c12be";
                 //var url = "api.openweathermap.org/data/2.5/forecast?q=\(searchText)&appid=\(key)&units=metric"
-                //let urlString = NSURL(string: url)
-                //let weatherObject = NSData(contentsOf: urlString! as URL)
-                
-                
 
                 WeatherIconView(weatherIcon: "cloud.sun.rain.fill", degrees: 23)
 
@@ -59,7 +55,7 @@ struct ContentView: View {
                 }
                 Spacer()
                 
-                Button {//btn do
+                Button {
                     isNight.toggle()
                 } label: {
                     ChangeDayView(imageName: "sun.min")
@@ -82,10 +78,10 @@ struct ContentView: View {
             case .success(let forecast):
                 for day in forecast.daily {//daily
                     print(dateFormatter.string(from:day.dt))
-                    print("   Humidity: ", day.humidity)
-                    print("   Clouds: ", day.clouds)
-                    print("   IconURL: ", day.weather[0].weatherIconURL)//equal string
-                    print("   Temperature: ", day.temp)
+                    print("Humidity: ", day.humidity)
+                    print("Clouds: ", day.clouds)
+                    print("IconURL: ", day.weather[0].weatherIconURL)//equal string
+                    print("Temperature: ", day.temp)
                 }
             case .failure(let apiError):
                 switch apiError {
